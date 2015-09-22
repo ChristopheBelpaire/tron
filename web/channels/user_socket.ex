@@ -2,7 +2,7 @@ defmodule Tron.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "rooms:*", Tron.RoomChannel
+   channel "rooms:*", Tron.GameChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -19,7 +19,8 @@ defmodule Tron.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(_params, socket) do
+  def connect(%{"token" => token}, socket) do
+    socket = assign(socket, :user, token)
     {:ok, socket}
   end
 
