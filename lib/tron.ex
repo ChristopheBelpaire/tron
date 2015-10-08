@@ -11,6 +11,7 @@ defmodule Tron do
       supervisor(Tron.Endpoint, []),
       # Start the Ecto repository
       worker(Tron.Repo, []),
+      worker(Tron.Users, []),
       # Here you could define other workers and supervisors as children
       # worker(Tron.Worker, [arg1, arg2, arg3]),
     ]
