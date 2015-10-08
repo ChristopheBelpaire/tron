@@ -3,6 +3,7 @@ defmodule Tron.UserSocket do
 
   ## Channels
    channel "rooms:*", Tron.GameChannel
+   channel "register:*", Tron.RegisterChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

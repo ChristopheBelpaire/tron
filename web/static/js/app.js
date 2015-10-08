@@ -28,46 +28,58 @@ var player1 = Player("Christophe", 200, 200,0);
 socket.connect({token: player1.name})
 
 // Now that you are connected, you can join channels with a topic:
-let channel = socket.channel("rooms:lobby", {});
-channel.join()
+let gameChannel = socket.channel("rooms:lobby", {});
+gameChannel.join()
   .receive("ok", resp => { console.log("Joined successfully", resp) })
   .receive("error", resp => { console.log("Unable to join", resp) })
 
-export default socket
+let registerChannel = socket.channel("register:player", {});
+registerChannel.join()
+  .receive("ok", resp => { console.log("Joined successfully", resp) })
+  .receive("error", resp => { console.log("Unable to join", resp) })
+
+
+//export default socket
 
 var c = document.getElementById("board");
 var ctx = c.getContext("2d");
 
+$("#register").click(function(){
+  console.log($("#name").val())
+  registerChannel.push("register", {body: $("#name").val()});
+})
 
+registerChannel.on("register", payload => {
+  player.direction = payload.body;
+});
 
-
-function step(ctx, player, channel ){
+function step(ctx, player, gameChannel ){
   document.onkeydown = function(e) {
     switch (e.keyCode) {
         case 37:
             console.log('left');
             //player.direction = 2;
-            channel.push("change_direction", {body: 2});
+            gameChannel.push("change_direction", {body: 2});
             break;
         case 38:
             player.direction = 3;
             //console.log('up');
-            channel.push("change_direction", {body: 3});
+            gameChannel.push("change_direction", {body: 3});
             break;
         case 39:
             console.log('right');
             //player.direction = 0;
-            channel.push("change_direction", {body: 0});
+            gameChannel.push("change_direction", {body: 0});
             break;
         case 40:
             console.log('down');
             //player.direction = 1;
-            channel.push("change_direction", {body: 1});
+            gameChannel.push("change_direction", {body: 1});
             break;
     }
   };
 
-  channel.on("change_direction", payload => {
+  gameChannel.on("change_direction", payload => {
     player.direction = payload.body;
   });
 
@@ -91,6 +103,6 @@ function step(ctx, player, channel ){
   }
 }
 
-var refresh = step(ctx, player1, channel);
+var refresh = step(ctx, player1, gameChannel);
 
 window.setInterval(refresh, 10);
