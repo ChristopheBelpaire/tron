@@ -7,19 +7,24 @@ defmodule Tron.Users do
   end
 
   def init(_) do
-    {:ok, []}
+    {:ok, {0, %{}}}
   end
 
-  def handle_cast({:add_user, name}, users_list) do
-    {:noreply, [name| users_list]}
+  def handle_call({:add_user, token }, _from, {nbr_users, users_list}) do
+    users_list = Dict.put(users_list, token, "")
+    {:reply, nbr_users+1, {nbr_users + 1, users_list}}
+  end
+
+  def handle_call({:set_username, token, name }, _from, {nbr_users, users_list}) do
+    users_list = Map.put(users_list, token, name)
   end
 
   def handle_call(:get_list_users, _from, users_list) do
     {:reply, users_list, users_list}
   end
 
-  def add_user(name) do
-    GenServer.cast(:users, {:add_user, name})
+  def add_user(token \\ "") do
+    GenServer.call(:users, {:add_user, token})
   end
 
   def get_users_list() do

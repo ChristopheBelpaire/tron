@@ -1,6 +1,6 @@
 defmodule Tron.RegisterChannel do
   use Phoenix.Channel
-  intercept ["register"]
+  intercept ["register", "register_usccessfull"]
 
   def join("register:player", auth_msg, socket) do
     {:ok, socket}
@@ -10,14 +10,21 @@ defmodule Tron.RegisterChannel do
     {:error, %{reason: "unauthorized"}}
   end
 
-  def handle_in("register", %{"body" => body}, socket) do
-    IO.inspect(body)
-    #broadcast! socket, "change_direction", %{body: body, user: socket.assigns.user}
+  def handle_in("register", %{"body" => name}, %{assigns: %{user: token}}, socket) do
+    IO.inspect(socket)
+    #Tron.Users.set_username(body, token)
+    broadcast! socket, "register", %{body: name}
     {:noreply, socket}
   end
 
-  def handle_out("change_direction", payload, socket) do
-    push socket, "change_direction", payload
+  def handle_out("register", payload, socket) do
+
+    if socket.assigns[:user] == payload[:body] do
+      IO.inspect(socket)
+      push socket, "register_successfull", payload
+    else
+      push socket, "new_user", payload
+    end
     {:noreply, socket}
   end
 end

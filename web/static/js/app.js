@@ -20,21 +20,38 @@ import "deps/phoenix_html/web/static/js/phoenix_html"
 import {Socket} from "deps/phoenix/web/static/js/phoenix"
 
 let socket = new Socket("/socket")
-
-var Player = function(name, x, y, direction){ return {name: name, x: x, y: y, direction: direction};};
-
-var player1 = Player("Christophe", 200, 200,0);
-
-socket.connect({token: player1.name})
-
-// Now that you are connected, you can join channels with a topic:
-let gameChannel = socket.channel("rooms:lobby", {});
-gameChannel.join()
-  .receive("ok", resp => { console.log("Joined successfully", resp) })
-  .receive("error", resp => { console.log("Unable to join", resp) })
+socket.connect({token: window.userToken})
 
 let registerChannel = socket.channel("register:player", {});
-registerChannel.join()
+
+var Player = function(name, x, y, direction){ return {name: name, x: x, y: y, direction: direction};};
+var player1;
+
+$("#register").click(function(){
+  var name = $("#name").val();
+  player1 = Player(name, 200, 200,0);
+  registerChannel.join()
+    .receive("ok", resp => {
+      console.log("Joined successfully", resp);
+      registerChannel.push("register", {body: player1.name});
+    })
+    .receive("error", resp => { console.log("Unable to join", resp) })
+
+})
+
+registerChannel.on("register_successfull", payload => {
+  $("#registerForm").hide();
+});
+
+registerChannel.on("new_user", payload => {
+  $("#usersList").append("<li>"+payload.user+"</li>")
+});
+
+
+// Now that you are connected, you can join channels with a topic:
+/*
+let gameChannel = socket.channel("rooms:lobby", {});
+gameChannel.join()
   .receive("ok", resp => { console.log("Joined successfully", resp) })
   .receive("error", resp => { console.log("Unable to join", resp) })
 
@@ -44,14 +61,9 @@ registerChannel.join()
 var c = document.getElementById("board");
 var ctx = c.getContext("2d");
 
-$("#register").click(function(){
-  console.log($("#name").val())
-  registerChannel.push("register", {body: $("#name").val()});
-})
 
-registerChannel.on("register", payload => {
-  player.direction = payload.body;
-});
+
+
 
 function step(ctx, player, gameChannel ){
   document.onkeydown = function(e) {
@@ -106,3 +118,4 @@ function step(ctx, player, gameChannel ){
 var refresh = step(ctx, player1, gameChannel);
 
 window.setInterval(refresh, 10);
+*/

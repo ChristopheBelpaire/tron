@@ -3,11 +3,11 @@
 <canvas id="board" width="800" height="600" style="border:1px solid #000000;">
 </canvas>
 
-
-<label for="name">Name</label>
-<input id=name> </input>
-<button id="register">Register</button>
-<ul "playerList">
-  <li>Christophe</li>
-  <li>Toto</li>
+<div id="registerForm">
+  <label for="name">Name</label>
+  <input id=name> </input>
+  <button id="register">Register</button>
+</div>
+<ul id="usersList">
+  
 </ul>
