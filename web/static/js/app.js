@@ -23,6 +23,11 @@ let socket = new Socket("/socket")
 socket.connect({token: window.userToken})
 
 let registerChannel = socket.channel("register:player", {});
+registerChannel.join()
+  .receive("ok", resp => {
+    console.log("Joined successfully", resp);
+  })
+  .receive("error", resp => { console.log("Unable to join", resp) })
 
 var Player = function(name, x, y, direction){ return {name: name, x: x, y: y, direction: direction};};
 var player1;
@@ -30,12 +35,7 @@ var player1;
 $("#register").click(function(){
   var name = $("#name").val();
   player1 = Player(name, 200, 200,0);
-  registerChannel.join()
-    .receive("ok", resp => {
-      console.log("Joined successfully", resp);
-      registerChannel.push("register", {body: player1.name});
-    })
-    .receive("error", resp => { console.log("Unable to join", resp) })
+  registerChannel.push("register", {body: player1.name});
 
 })
 
@@ -44,7 +44,7 @@ registerChannel.on("register_successfull", payload => {
 });
 
 registerChannel.on("new_user", payload => {
-  $("#usersList").append("<li>"+payload.user+"</li>")
+  $("#usersList").append("<li>"+payload.name+"</li>")
 });
 
 

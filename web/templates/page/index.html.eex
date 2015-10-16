@@ -9,5 +9,7 @@
   <button id="register">Register</button>
 </div>
 <ul id="usersList">
-  
+  <%=for {token, name} <- users do %>
+    <li id="<%=token%>"><%=name%></li>
+  <% end %>
 </ul>

@@ -3,6 +3,6 @@ defmodule Tron.PageView do
 
   def users do
     {_, users} =Tron.Users.get_users_list
-    users
+    users |> Enum.reject(fn {token, name}-> name=="" end)
   end
 end

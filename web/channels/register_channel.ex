@@ -10,16 +10,26 @@ defmodule Tron.RegisterChannel do
     {:error, %{reason: "unauthorized"}}
   end
 
-  def handle_in("register", %{"body" => name}, %{assigns: %{user: token}}, socket) do
-    IO.inspect(socket)
-    #Tron.Users.set_username(body, token)
-    broadcast! socket, "register", %{body: name}
+  def terminate(reason, socket) do
+    Tron.Users.delete_user(socket.assigns[:token])
+    broadcast! socket, "user_deleted", %{token: socket.assigns[:token], name: socket.assigns[:name] }
+    {:noreply, socket}
+  end
+
+  def handle_in("register", %{"body" => name}, socket) do
+    token = socket.assigns[:token]
+    socket = assign(socket, :name, name)
+    IO.inspect(token)
+    IO.inspect(name)
+
+    Tron.Users.set_username(token, name)
+    broadcast! socket, "register", %{name: name, token: token}
     {:noreply, socket}
   end
 
   def handle_out("register", payload, socket) do
 
-    if socket.assigns[:user] == payload[:body] do
+    if socket.assigns[:token] == payload[:token] do
       IO.inspect(socket)
       push socket, "register_successfull", payload
     else

@@ -21,7 +21,7 @@ defmodule Tron.UserSocket do
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
   def connect(%{"token" => token}, socket) do
-    socket = assign(socket, :user, token)
+    socket = assign(socket, :token, token)
     {:ok, socket}
   end
 
